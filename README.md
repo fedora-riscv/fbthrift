@@ -1,0 +1,3 @@
+# fbthrift
+
+The fbthrift package
