@@ -1,0 +1,97 @@
+From 20792d34c478693be3163be51156275994db6c68 Mon Sep 17 00:00:00 2001
+From: Michel Alexandre Salim <michel@michel-slm.name>
+Date: Tue, 3 Nov 2020 11:43:52 -0800
+Subject: [PATCH] Fix undefined-non-weak-symbol warnings
+
+see https://fedoraproject.org/wiki/UnderstandingDSOLinkChange
+---
+ thrift/compiler/CMakeLists.txt | 3 +++
+ thrift/lib/cpp/CMakeLists.txt  | 3 +++
+ thrift/lib/cpp2/CMakeLists.txt | 6 ++++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/thrift/compiler/CMakeLists.txt b/thrift/compiler/CMakeLists.txt
+index 1ab985ac6..c0e134cc6 100644
+--- a/thrift/compiler/CMakeLists.txt
++++ b/thrift/compiler/CMakeLists.txt
+@@ -40,6 +40,7 @@ add_library(
+   ast/t_typedef.cc
+   ast/base_types.cc
+   ast/t_scope.cc
++  ast/visitor.cc
+ )
+ target_link_libraries(compiler_ast ${OPENSSL_LIBRARIES})
+ 
+@@ -115,10 +116,12 @@ add_library(
+ 
+   ${GENERATOR_FILES}
+   $<TARGET_OBJECTS:compiler_generate_templates>
++  validator/validator.cc
+ )
+ target_link_libraries(
+   compiler_generators
+ 
++  compiler_ast
+   compiler_base
+   compiler_lib
+   mustache_lib
+diff --git a/thrift/lib/cpp/CMakeLists.txt b/thrift/lib/cpp/CMakeLists.txt
+index 763e9b844..4bfdbfc7d 100644
+--- a/thrift/lib/cpp/CMakeLists.txt
++++ b/thrift/lib/cpp/CMakeLists.txt
+@@ -60,6 +60,9 @@ add_library(
+   protocol/TProtocolException.cpp
+   protocol/TSimpleJSONProtocol.cpp
+   ${reflection-cpp2-SOURCES}
++  util/VarintUtils.cpp
++  ../cpp2/gen/module_types_cpp.cpp
++  ../cpp2/protocol/CompactProtocol.cpp # can't link against thriftprotocol, dep cycle
+ )
+ add_dependencies(protocol reflection-cpp2-target)
+ target_link_libraries(
+diff --git a/thrift/lib/cpp2/CMakeLists.txt b/thrift/lib/cpp2/CMakeLists.txt
+index edc34cae5..90ef25304 100644
+--- a/thrift/lib/cpp2/CMakeLists.txt
++++ b/thrift/lib/cpp2/CMakeLists.txt
+@@ -33,12 +33,15 @@ add_library(
+   thriftmetadata
+ 
+   ${metadata-cpp2-SOURCES}
++  gen/module_types_cpp.cpp
++  protocol/CompactProtocol.cpp # can't link against thriftprotocol, dep cycle
+ )
+ add_dependencies(thriftmetadata metadata-cpp2-target)
+ target_link_libraries(
+   thriftmetadata
+   PUBLIC
+     Folly::folly
++    protocol
+ )
+ 
+ bypass_source_check("${frozen-cpp2-SOURCES}")
+@@ -56,6 +59,7 @@ target_link_libraries(
+   PUBLIC
+     Folly::folly
+     thriftmetadata
++    thriftprotocol
+     ${GLOG_LIBRARIES}
+     ${LIBGFLAGS_LIBRARY}
+ )
+@@ -66,12 +70,14 @@ add_library(
+ 
+   ${RpcMetadata-cpp2-SOURCES}
+   gen/module_types_cpp.cpp
++  protocol/CompactProtocol.cpp # can't link against thriftprotocol, dep cycle
+ )
+ add_dependencies(rpcmetadata RpcMetadata-cpp2-target)
+ target_link_libraries(
+   rpcmetadata
+   PUBLIC
+     Folly::folly
++    protocol
+ )
+ 
+ add_library(
+-- 
+2.28.0
+
