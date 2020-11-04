@@ -1,4 +1,4 @@
-# Depends on fizz, which has linking issues on some platforms:
+## Depends on fizz, which has linking issues on some platforms:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1893332
 %ifarch i686 x86_64
 %bcond_without static
@@ -10,14 +10,14 @@
 
 Name:           fbthrift
 Version:        2020.11.02.00
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         %{name}-%{version}-fix_undefined_symbols.patch
-Patch1:         %{name}-%{version}-fix_static_build.patch
+Patch0:         %{url}/commit/54dc36c450a09d5f41c0bc31b59247063ed30ed2.patch#/%{name}-%{version}-fuse_protocol_thriftprotocol.patch
+Patch1:         %{name}-%{version}-fix_undefined_symbols.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -140,6 +140,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-3
+- Rebase patch on top of upstream CMakeLists.txt change
+
 * Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-2
 - Enable static subpackage on architectures where fizz-static is available
 
