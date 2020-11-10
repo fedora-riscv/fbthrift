@@ -1,3 +1,5 @@
+%bcond_with python
+
 ## Depends on fizz, which has linking issues on some platforms:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1893332
 %ifarch i686 x86_64
@@ -9,15 +11,14 @@
 %global _static_builddir static_build
 
 Name:           fbthrift
-Version:        2020.11.02.00
-Release:        3%{?dist}
+Version:        2020.11.09.00
+Release:        1%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         %{url}/commit/54dc36c450a09d5f41c0bc31b59247063ed30ed2.patch#/%{name}-%{version}-fuse_protocol_thriftprotocol.patch
-Patch1:         %{name}-%{version}-fix_undefined_symbols.patch
+Patch0:         %{name}-py_destdir.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -31,13 +32,7 @@ BuildRequires:  flex
 # Library dependencies
 BuildRequires:  fizz-devel
 BuildRequires:  folly-devel
-BuildRequires:  python3-six
 BuildRequires:  wangle-devel
-%if %{with static}
-BuildRequires:  fizz-static
-BuildRequires:  folly-static
-BuildRequires:  wangle-static
-%endif
 
 %description
 Thrift is a serialization and RPC framework for service communication. Thrift
@@ -63,9 +58,37 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
 
+%if %{with python}
+%package -n python3-%{name}
+Summary:        Python bindings for %{name}
+BuildRequires:  python3-devel
+BuildRequires:  python3-folly-devel
+BuildRequires:  python3dist(cython)
+BuildRequires:  python3dist(wheel)
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Conflicts:      python3-thrift
+
+%description -n python3-%{name}
+The python3-%{name} package contains Python bindings for %{name}.
+
+
+%package -n python3-%{name}-devel
+Summary:        Development files for python3-%{name}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       python3-%{name}%{?_isa} = %{version}-%{release}
+
+%description -n python3-%{name}-devel
+The python3-%{name}-devel package contains libraries and header files for
+developing applications that use python3-%{name}.
+%endif
+
+
 %if %{with static}
 %package        static
 Summary:        Static development libraries for %{name}
+BuildRequires:  fizz-static
+BuildRequires:  folly-static
+BuildRequires:  wangle-static
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 
 %description    static
@@ -100,6 +123,9 @@ popd
   -DCMAKE_INSTALL_DIR=%{_libdir}/cmake/%{name} \
   -DCMAKE_SKIP_INSTALL_RPATH=TRUE \
   -DPACKAGE_VERSION=%{version} \
+%if %{with python}
+  -Dthriftpy3=ON \
+%endif
   -Denable_tests=ON
 %cmake_build
 
@@ -131,6 +157,19 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_includedir}/*
 %{_libdir}/*.so
 %{_libdir}/cmake/%{name}
+%exclude %{_includedir}/thrift/lib/py3
+
+%if %{with python}
+%files -n python3-%{name}
+%{python3_sitearch}/thrift
+%{python3_sitearch}/thrift-0.0.1-py%{python3_version}.egg-info
+%exclude %{python3_sitearch}/thrift/py3/*.pxd
+
+%files -n python3-%{name}-devel
+%{_includedir}/thrift/lib/py3
+%{python3_sitearch}/thrift/*.pxd
+%{python3_sitearch}/thrift/py3/*.pxd
+%endif
 
 %if %{with static}
 %files static
@@ -140,6 +179,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Mon Nov  9 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-1
+- Update to 2020.11.09.00
+- Enable Python binding
+
 * Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-3
 - Rebase patch on top of upstream CMakeLists.txt change
 
