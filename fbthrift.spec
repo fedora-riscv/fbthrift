@@ -1,4 +1,4 @@
-%bcond_with python
+%bcond_without python
 
 ## Depends on fizz, which has linking issues on some platforms:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1893332
@@ -12,7 +12,7 @@
 
 Name:           fbthrift
 Version:        2020.11.09.00
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
@@ -179,6 +179,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Tue Nov 10 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-2
+- Enable Python binding by default
+
 * Mon Nov  9 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-1
 - Update to 2020.11.09.00
 - Enable Python binding
