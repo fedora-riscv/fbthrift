@@ -12,13 +12,14 @@
 
 Name:           fbthrift
 Version:        2020.11.09.00
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-py_destdir.patch
+Patch1:         %{name}-python3-cmake.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -179,6 +180,10 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Fri Nov 13 2020 Filipe Brandenburger <filbranden@fb.com> - 2020.11.09.00-3
+- Update CMakeList and setup.py for python3 to include all modules and
+  to include enums source together with the types module.
+
 * Tue Nov 10 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-2
 - Enable Python binding by default
 
