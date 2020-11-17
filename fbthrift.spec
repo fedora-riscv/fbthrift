@@ -1,4 +1,9 @@
+# requires python3-Cython >= 0.29.17 for libcpp.utility.move
+%if 0%{?fedora} >= 33 || 0%{?rhel} >= 9
 %bcond_without python
+%else
+%bcond_with python
+%endif
 
 ## Depends on fizz, which has linking issues on some platforms:
 # https://bugzilla.redhat.com/show_bug.cgi?id=1893332
