@@ -17,7 +17,7 @@
 
 Name:           fbthrift
 Version:        2020.12.28.00
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
@@ -183,6 +183,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 2020.12.28.00-2
+- Rebuilt for Boost 1.75
+
 * Tue Dec 29 12:15:55 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.12.28.00-1
 - Update to 2020.12.28.00
 
