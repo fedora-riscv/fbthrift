@@ -16,7 +16,7 @@
 %global _static_builddir static_build
 
 Name:           fbthrift
-Version:        2021.02.01.00
+Version:        2021.03.15.00
 Release:        1%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
@@ -183,6 +183,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Mon Mar 15 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.03.15.00-1
+- Update to 2021.03.15.00
+
 * Wed Feb 03 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.02.01.00-1
 - Update to 2021.02.01.00
 
