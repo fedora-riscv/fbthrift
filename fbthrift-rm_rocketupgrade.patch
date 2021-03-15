@@ -1,0 +1,29 @@
+From 09d1cf9974141439a6caf975eff82380d45b182c Mon Sep 17 00:00:00 2001
+From: Songqiao Su <thr@fb.com>
+Date: Mon, 15 Mar 2021 16:05:41 -0700
+Subject: [PATCH] fix some oss build for rocketupgrade
+
+Summary: miss one place to remove the target
+
+Reviewed By: jmswen
+
+Differential Revision: D27057463
+
+fbshipit-source-id: 8a836ceba99d8cbf52326e24f9497cbb3fc59ebd
+---
+ thrift/lib/cpp2/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/thrift/lib/cpp2/CMakeLists.txt b/thrift/lib/cpp2/CMakeLists.txt
+index 3622c8a70e..85f51fcbdf 100644
+--- a/thrift/lib/cpp2/CMakeLists.txt
++++ b/thrift/lib/cpp2/CMakeLists.txt
+@@ -220,7 +220,7 @@ install(
+ 
+ if (BUILD_SHARED_LIBS)
+   set_target_properties(rpcmetadata thriftmetadata thriftfrozen2 thriftprotocol
+-    rocketupgrade thriftcpp2
++    thriftcpp2
+     PROPERTIES VERSION ${PROJECT_VERSION}
+     )
+ endif()

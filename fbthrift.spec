@@ -23,6 +23,7 @@ Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         %{url}/commit/09d1cf9974141439a6caf975eff82380d45b182c.patch#/%{name}-rm_rocketupgrade.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
