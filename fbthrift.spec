@@ -16,7 +16,7 @@
 %global _static_builddir static_build
 
 Name:           fbthrift
-Version:        2021.03.22.00
+Version:        2021.03.29.00
 Release:        1%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
@@ -183,6 +183,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Mon Mar 29 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.03.29.00-1
+- Update to 2021.03.29.00
+
 * Wed Mar 24 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.03.22.00-1
 - Update to 2021.03.22.00
 
