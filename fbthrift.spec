@@ -66,6 +66,7 @@ developing applications that use %{name}.
 %package -n python3-%{name}
 Summary:        Python bindings for %{name}
 BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  python3-folly-devel
 BuildRequires:  python3dist(cython)
 BuildRequires:  python3dist(wheel)
