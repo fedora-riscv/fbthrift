@@ -17,7 +17,7 @@
 
 Name:           fbthrift
 Version:        2021.05.10.00
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
@@ -184,6 +184,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2021.05.10.00-2
+- Rebuilt for Python 3.10
+
 * Mon May 10 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.05.10.00-1
 - Update to 2021.05.10.00
 
