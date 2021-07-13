@@ -16,13 +16,15 @@
 %global _static_builddir static_build
 
 Name:           fbthrift
-Version:        2021.05.10.00
-Release:        3%{?dist}
+Version:        2021.06.28.00
+Release:        1%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+# avoid clashes with GCC11's _serialize macro
+Patch0:         %{name}-py3-rename_serialize.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -32,6 +34,7 @@ BuildRequires:  cmake
 BuildRequires:  gcc-c++
 # Tool dependencies
 BuildRequires:  bison
+BuildRequires:  chrpath
 BuildRequires:  flex
 # Library dependencies
 BuildRequires:  fizz-devel
@@ -147,6 +150,12 @@ popd
 
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
+%if %{with python}
+# Delete RPATHs
+chrpath --delete \
+  $RPM_BUILD_ROOT%{python3_sitearch}/thrift/py3/*.so
+%endif
+
 
 %check
 %ctest
@@ -184,6 +193,9 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 
 %changelog
+* Mon Jul 12 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-1
+- Update to 2021.06.28.00
+
 * Mon Jul 05 2021 Richard Shaw <hobbes1069@gmail.com> - 2021.05.10.00-3
 - Rebuild for new fmt version.
 
