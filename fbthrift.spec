@@ -17,7 +17,7 @@
 
 Name:           fbthrift
 Version:        2021.06.28.00
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
@@ -193,6 +193,9 @@ chrpath --delete \
 
 
 %changelog
+* Sun Jul 25 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-3
+- Rebuilt for Folly 2021.07.20.01
+
 * Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2021.06.28.00-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
