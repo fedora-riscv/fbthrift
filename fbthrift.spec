@@ -17,14 +17,12 @@
 
 Name:           fbthrift
 Version:        2021.06.28.00
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-# avoid clashes with GCC11's _serialize macro
-Patch0:         %{name}-py3-rename_serialize.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -193,6 +191,10 @@ chrpath --delete \
 
 
 %changelog
+* Mon Jul 26 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-4
+- Remove patch to rename _serialize, now that folly has been
+  updated to not include the problematic header file.
+
 * Sun Jul 25 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-3
 - Rebuilt for Folly 2021.07.20.01
 
