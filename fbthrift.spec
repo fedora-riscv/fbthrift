@@ -17,12 +17,13 @@
 
 Name:           fbthrift
 Version:        2021.06.28.00
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Patch0:         %{name}-stream-cython.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -191,6 +192,9 @@ chrpath --delete \
 
 
 %changelog
+* Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-5
+- Include stream.{pxd,pyx,cpp} build in thrift/lib/py3 CMakeLists.
+
 * Mon Jul 26 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-4
 - Remove patch to rename _serialize, now that folly has been
   updated to not include the problematic header file.
