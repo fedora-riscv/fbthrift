@@ -15,9 +15,12 @@
 
 %global _static_builddir static_build
 
+# Use C++20 standard, required for folly coroutines.
+%global build_cxxflags -std=c++20 %{optflags}
+
 Name:           fbthrift
 Version:        2021.06.28.00
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
@@ -192,6 +195,9 @@ chrpath --delete \
 
 
 %changelog
+* Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-6
+- Use C++20 standard, in order to enable C++ coroutines.
+
 * Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-5
 - Include stream.{pxd,pyx,cpp} build in thrift/lib/py3 CMakeLists.
 
