@@ -1,4 +1,4 @@
-From 68883a998125a15d445b8c36143bbee1b330da7e Mon Sep 17 00:00:00 2001
+From 09459891450e13e7cf2fa6fe36958cf63bf3df32 Mon Sep 17 00:00:00 2001
 From: Michel Alexandre Salim <salimma@fedoraproject.org>
 Date: Fri, 30 Jul 2021 21:43:36 -0700
 Subject: [PATCH] Disable armv7hl size assertion
@@ -9,7 +9,7 @@ Signed-off-by: Michel Alexandre Salim <salimma@fedoraproject.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/thrift/lib/cpp2/async/ServerPublisherStream.h b/thrift/lib/cpp2/async/ServerPublisherStream.h
-index 471dc7505..5cbff6f6a 100644
+index 471dc7505..a91a56264 100644
 --- a/thrift/lib/cpp2/async/ServerPublisherStream.h
 +++ b/thrift/lib/cpp2/async/ServerPublisherStream.h
 @@ -155,9 +155,11 @@ class ServerPublisherStream : private StreamServerCallback {
@@ -20,7 +20,7 @@ index 471dc7505..5cbff6f6a 100644
        static_assert(
            sizeof credits == sizeof buffer,
            "CreditBuffer members must be the same size");
-+      #end
++      #endif
        credits.isSet = true;
        credits.val = 0;
      }
