@@ -1,0 +1,29 @@
+From 01718ea5fc8f9bdf228214398f1f99ceaa7fbe79 Mon Sep 17 00:00:00 2001
+From: Michel Alexandre Salim <salimma@fedoraproject.org>
+Date: Fri, 30 Jul 2021 15:30:52 -0700
+Subject: [PATCH] Fix `std::min` comparison on i686
+
+Explicitly cast the second argument to `uint64_t` since otherwise,
+on `i686` it is detected to be an `int64_t` instead
+
+Signed-off-by: Michel Alexandre Salim <salimma@fedoraproject.org>
+---
+ thrift/lib/cpp2/async/ServerPublisherStream.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/thrift/lib/cpp2/async/ServerPublisherStream.h b/thrift/lib/cpp2/async/ServerPublisherStream.h
+index d2a90d542..471dc7505 100644
+--- a/thrift/lib/cpp2/async/ServerPublisherStream.h
++++ b/thrift/lib/cpp2/async/ServerPublisherStream.h
+@@ -168,7 +168,7 @@ class ServerPublisherStream : private StreamServerCallback {
+     }
+     void addCredits(int64_t delta) {
+       DCHECK(credits.isSet);
+-      credits.val = std::min(maxCreditVal, credits.val + delta);
++      credits.val = std::min(maxCreditVal, static_cast<uint64_t>(credits.val + delta));
+     }
+     bool hasCredit() { return credits.isSet && credits.val; }
+     void storeBuffer(Queue&& buf) {
+-- 
+2.31.1
+

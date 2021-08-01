@@ -27,6 +27,8 @@ License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-stream-cython.patch
+Patch1:         %{name}-fix_std_min-comparison-i686.patch
+Patch2:         %{name}-disable-assert-armv7hl.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -195,8 +197,9 @@ chrpath --delete \
 
 
 %changelog
-* Thu Jul 29 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.07.22.00-1
+* Sun Aug  1 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.07.22.00-1
 - Update to 2021.07.22.00
+- Fix stream compilation on i686 and armv7hl
 
 * Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-6
 - Use C++20 standard, in order to enable C++ coroutines.
