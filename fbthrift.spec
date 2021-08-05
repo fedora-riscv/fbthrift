@@ -19,16 +19,16 @@
 %global build_cxxflags -std=c++20 %{optflags}
 
 Name:           fbthrift
-Version:        2021.07.22.00
+Version:        2021.08.02.00
 Release:        1%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         %{name}-stream-cython.patch
 Patch1:         %{name}-fix_std_min-comparison-i686.patch
 Patch2:         %{name}-disable-assert-armv7hl.patch
+Patch3:         %{name}-use-fbthrift-prefix-for-serdes.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -197,6 +197,11 @@ chrpath --delete \
 
 
 %changelog
+* Thu Aug  5 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.08.02.00-1
+- Update to 2021.08.02.00
+- Drop now upstreamed patch to fix Cython build of stream.
+- Use _fbprefix for _serialize and _deserialize.
+
 * Sun Aug  1 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.07.22.00-1
 - Update to 2021.07.22.00
 - Fix stream compilation on i686 and armv7hl

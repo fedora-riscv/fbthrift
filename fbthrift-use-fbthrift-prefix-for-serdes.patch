@@ -1,0 +1,70 @@
+diff -Naur fbthrift-2021.08.02.00.orig/thrift/compiler/generate/templates/py3/types.pyx.mustache fbthrift-2021.08.02.00/thrift/compiler/generate/templates/py3/types.pyx.mustache
+--- fbthrift-2021.08.02.00.orig/thrift/compiler/generate/templates/py3/types.pyx.mustache	2021-08-01 20:30:09.000000000 -0700
++++ fbthrift-2021.08.02.00/thrift/compiler/generate/templates/py3/types.pyx.mustache	2021-08-05 17:36:54.984646402 -0700
+@@ -393,13 +393,13 @@
+         self._fbthrift_struct_size = {{struct:size}}
+ 
+     {{^struct:exception?}}
+-    cdef _fbthrift_iobuf.IOBuf _serialize({{struct:name}} self, __Protocol proto):
++    cdef _fbthrift_iobuf.IOBuf _fbthrift_serialize({{struct:name}} self, __Protocol proto):
+         cdef unique_ptr[_fbthrift_iobuf.cIOBuf] data
+         with nogil:
+             data = cmove(serializer.cserialize[c{{struct:name}}](self._cpp_obj.get(), proto))
+         return _fbthrift_iobuf.from_unique_ptr(cmove(data))
+ 
+-    cdef cuint32_t _deserialize({{struct:name}} self, const _fbthrift_iobuf.cIOBuf* buf, __Protocol proto) except? 0:
++    cdef cuint32_t _fbthrift_deserialize({{struct:name}} self, const _fbthrift_iobuf.cIOBuf* buf, __Protocol proto) except? 0:
+         cdef cuint32_t needed
+         {{!
+             This is a special case, we need to construct an empty _cpp_obj because
+diff -Naur fbthrift-2021.08.02.00.orig/thrift/lib/py3/serializer.pyx fbthrift-2021.08.02.00/thrift/lib/py3/serializer.pyx
+--- fbthrift-2021.08.02.00.orig/thrift/lib/py3/serializer.pyx	2021-08-01 20:30:09.000000000 -0700
++++ fbthrift-2021.08.02.00/thrift/lib/py3/serializer.pyx	2021-08-05 17:37:15.888836367 -0700
+@@ -27,7 +27,7 @@
+     if not isinstance(protocol, Protocol):
+         raise TypeError(f"{protocol} must of type Protocol")
+     cdef Struct cy_struct = <Struct> tstruct
+-    return cy_struct._serialize(protocol)
++    return cy_struct._fbthrift_serialize(protocol)
+ 
+ 
+ def deserialize_with_length(structKlass, buf not None, protocol=Protocol.COMPACT):
+@@ -39,7 +39,7 @@
+ 
+     cdef IOBuf iobuf = buf if isinstance(buf, IOBuf) else IOBuf(buf)
+     try:
+-        length = cy_struct._deserialize(iobuf._this, protocol)
++        length = cy_struct._fbthrift_deserialize(iobuf._this, protocol)
+         return cy_struct, length
+     except Exception as e:
+         raise Error.__new__(Error, *e.args) from None
+diff -Naur fbthrift-2021.08.02.00.orig/thrift/lib/py3/types.pxd fbthrift-2021.08.02.00/thrift/lib/py3/types.pxd
+--- fbthrift-2021.08.02.00.orig/thrift/lib/py3/types.pxd	2021-08-01 20:30:09.000000000 -0700
++++ fbthrift-2021.08.02.00/thrift/lib/py3/types.pxd	2021-08-05 17:37:33.724998448 -0700
+@@ -141,8 +141,8 @@
+     cdef object _fbthrift_hash
+     cdef object __weakref__
+     cdef size_t _fbthrift_struct_size
+-    cdef IOBuf _serialize(self, Protocol proto)
+-    cdef uint32_t _deserialize(self, const cIOBuf* buf, Protocol proto) except? 0
++    cdef IOBuf _fbthrift_serialize(self, Protocol proto)
++    cdef uint32_t _fbthrift_deserialize(self, const cIOBuf* buf, Protocol proto) except? 0
+     cdef object _fbthrift_isset(self)
+     cdef bint _fbthrift_noncomparable_eq(self, other)
+     cdef object _fbthrift_cmp_sametype(self, other, int op)
+diff -Naur fbthrift-2021.08.02.00.orig/thrift/lib/py3/types.pyx fbthrift-2021.08.02.00/thrift/lib/py3/types.pyx
+--- fbthrift-2021.08.02.00.orig/thrift/lib/py3/types.pyx	2021-08-01 20:30:09.000000000 -0700
++++ fbthrift-2021.08.02.00/thrift/lib/py3/types.pyx	2021-08-05 17:38:03.470268753 -0700
+@@ -130,10 +130,10 @@
+     """
+     Base class for all thrift structs
+     """
+-    cdef IOBuf _serialize(self, Protocol proto):
++    cdef IOBuf _fbthrift_serialize(self, Protocol proto):
+         return IOBuf(b'')
+ 
+-    cdef uint32_t _deserialize(self, const cIOBuf* buf, Protocol proto) except? 0:
++    cdef uint32_t _fbthrift_deserialize(self, const cIOBuf* buf, Protocol proto) except? 0:
+         return 0
+ 
+     cdef object _fbthrift_isset(self):
