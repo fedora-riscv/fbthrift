@@ -20,7 +20,7 @@
 
 Name:           fbthrift
 Version:        2021.08.02.00
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
@@ -197,6 +197,9 @@ chrpath --delete \
 
 
 %changelog
+* Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 2021.08.02.00-2
+- Rebuilt for Boost 1.76
+
 * Thu Aug  5 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.08.02.00-1
 - Update to 2021.08.02.00
 - Drop now upstreamed patch to fix Cython build of stream.
