@@ -1,0 +1,121 @@
+* Thu Nov 18 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.11.15.00-1
+- Update to 2021.11.15.00
+- Opt in to rpmautospec
+- Patch to support disabling Python tests, and disable all tests for now                                                                                           
+  because of an include path problem
+
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2021.08.02.00-3
+- Rebuilt with OpenSSL 3.0.0
+
+* Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 2021.08.02.00-2
+- Rebuilt for Boost 1.76
+
+* Thu Aug  5 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.08.02.00-1
+- Update to 2021.08.02.00
+- Drop now upstreamed patch to fix Cython build of stream.
+- Use _fbprefix for _serialize and _deserialize.
+
+* Sun Aug  1 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.07.22.00-1
+- Update to 2021.07.22.00
+- Fix stream compilation on i686 and armv7hl
+
+* Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-6
+- Use C++20 standard, in order to enable C++ coroutines.
+
+* Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-5
+- Include stream.{pxd,pyx,cpp} build in thrift/lib/py3 CMakeLists.
+
+* Mon Jul 26 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-4
+- Remove patch to rename _serialize, now that folly has been
+  updated to not include the problematic header file.
+
+* Sun Jul 25 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-3
+- Rebuilt for Folly 2021.07.20.01
+
+* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2021.06.28.00-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Mon Jul 12 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-1
+- Update to 2021.06.28.00
+
+* Mon Jul 05 2021 Richard Shaw <hobbes1069@gmail.com> - 2021.05.10.00-3
+- Rebuild for new fmt version.
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2021.05.10.00-2
+- Rebuilt for Python 3.10
+
+* Mon May 10 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.05.10.00-1
+- Update to 2021.05.10.00
+
+* Mon Apr 26 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.04.26.00-1
+- Update to 2021.04.26.00
+
+* Fri Apr 16 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.04.12.00-1
+- Update to 2021.04.12.00
+
+* Mon Mar 29 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.03.29.00-1
+- Update to 2021.03.29.00
+
+* Wed Mar 24 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.03.22.00-1
+- Update to 2021.03.22.00
+
+* Mon Mar 15 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.03.15.00-1
+- Update to 2021.03.15.00
+
+* Wed Feb 03 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.02.01.00-1
+- Update to 2021.02.01.00
+
+* Tue Jan 26 17:50:22 PST 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.01.25.00-1
+- Update to 2021.01.25.00
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2020.12.28.00-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 2020.12.28.00-2
+- Rebuilt for Boost 1.75
+
+* Tue Dec 29 12:15:55 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.12.28.00-1
+- Update to 2020.12.28.00
+
+* Tue Dec 22 16:57:24 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.12.21.00-1
+- Update to 2020.12.21.00
+
+* Mon Nov 30 10:42:52 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.30.00-1
+- Update to 2020.11.30.00
+
+* Mon Nov 23 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.23.00-1
+- Update to 2020.11.23.00
+
+* Mon Nov 16 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.16.00-1
+- Update to 2020.11.16.00
+
+* Fri Nov 13 2020 Filipe Brandenburger <filbranden@fb.com> - 2020.11.09.00-3
+- Update CMakeList and setup.py for python3 to include all modules and
+  to include enums source together with the types module.
+
+* Tue Nov 10 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-2
+- Enable Python binding by default
+
+* Mon Nov  9 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-1
+- Update to 2020.11.09.00
+- Enable Python binding
+
+* Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-3
+- Rebase patch on top of upstream CMakeLists.txt change
+
+* Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-2
+- Enable static subpackage on architectures where fizz-static is available
+
+* Mon Nov  2 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-1
+- Update to 2020.11.02.00
+- Fix undefined symbol warnings
+
+* Mon Nov  2 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.10.26.00-3
+- Mark fbthrift-devel as conflicting with thrift-devel
+- Disable RPATH when installing libraries
+
+* Thu Oct 29 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.10.26.00-2
+- Use shorter, canonical URL for source
+
+* Tue Oct 27 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.10.26.00-1
+- Initial package
