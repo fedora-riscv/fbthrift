@@ -1,5 +1,5 @@
 # requires python3-Cython >= 0.29.17 for libcpp.utility.move
-%if 0%{?fedora} >= 33 || 0%{?rhel} >= 9
+%if 0%{?fedora} || 0%{?rhel} >= 9
 %bcond_without python
 %else
 %bcond_with python
@@ -24,14 +24,13 @@
 %global build_cxxflags -std=c++20 %{optflags}
 
 Name:           fbthrift
-Version:        2021.11.15.00
+Version:        2021.11.29.00
 Release:        %autorelease
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-Patch0:         %{name}-toggle_py_tests.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
