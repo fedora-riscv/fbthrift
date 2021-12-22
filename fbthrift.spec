@@ -20,9 +20,6 @@
 # [FAILURE:/builddir/build/BUILD/fbthrift-2021.11.15.00/thrift/lib/py3/test/testing.thrift:17] Could not find include file thrift/annotation/cpp.thrift
 %bcond_with tests
 
-# Use C++20 standard, required for folly coroutines.
-%global build_cxxflags -std=c++20 %{optflags}
-
 Name:           fbthrift
 Version:        2021.11.29.00
 Release:        %autorelease
