@@ -1,0 +1,63 @@
+From faa9fb530f0058497e27f8f5dc1a6727c8570429 Mon Sep 17 00:00:00 2001
+From: Michel Alexandre Salim <salimma@fedoraproject.org>
+Date: Thu, 23 Dec 2021 16:15:12 -0800
+Subject: [PATCH] Revert "Fix crash in py3 serializer when using
+ deserialize_from_header"
+
+This reverts commit 1cf7dbaa5734aaba85561a9005436c231936e9dd.
+---
+ thrift/lib/py3/serializer.pxd     | 2 +-
+ thrift/lib/py3/serializer.pyx     | 8 +-------
+ thrift/lib/py3/test/serializer.py | 8 --------
+ 3 files changed, 2 insertions(+), 16 deletions(-)
+
+diff --git a/thrift/lib/py3/serializer.pxd b/thrift/lib/py3/serializer.pxd
+index 880160ef6..ad12d6932 100644
+--- a/thrift/lib/py3/serializer.pxd
++++ b/thrift/lib/py3/serializer.pxd
+@@ -39,4 +39,4 @@ cdef extern from "thrift/lib/cpp/transport/THeader.h" namespace "apache::thrift:
+         uint16_t getProtocolId()
+         void setTransform(Transform)
+         unique_ptr[cIOBuf] addHeader(unique_ptr[cIOBuf], map[string, string])
+-        unique_ptr[cIOBuf] removeHeader(cIOBufQueue*, size_t&, map[string, string]) except +
++        unique_ptr[cIOBuf] removeHeader(cIOBufQueue*, size_t&, map[string, string])
+diff --git a/thrift/lib/py3/serializer.pyx b/thrift/lib/py3/serializer.pyx
+index b924ddb5a..7d3acb04c 100644
+--- a/thrift/lib/py3/serializer.pyx
++++ b/thrift/lib/py3/serializer.pyx
+@@ -75,12 +75,6 @@ def deserialize_from_header(structKlass, buf not None):
+     cdef cTHeader header
+     cdef map[string, string] pheaders
+     cdef size_t needed = 0
+-    cdef unique_ptr[cIOBuf] cbuf
+-    try:
+-        cbuf = header.removeHeader(&queue, needed, pheaders)
+-    except Exception as e:
+-        raise Error.__new__(Error, *e.args) from None
+-    if cbuf == NULL:
+-        raise BufferError("Bad data used for deserialize")
++    cbuf = header.removeHeader(&queue, needed, pheaders)
+     protoid = Protocol(header.getProtocolId())
+     return deserialize(structKlass, _fbthrift_iobuf.from_unique_ptr(_fbthrift_iobuf.move(cbuf)), protocol=protoid)
+diff --git a/thrift/lib/py3/test/serializer.py b/thrift/lib/py3/test/serializer.py
+index d92dc27ad..60ec4ee01 100644
+--- a/thrift/lib/py3/test/serializer.py
++++ b/thrift/lib/py3/test/serializer.py
+@@ -116,14 +116,6 @@ class SerializerTests(unittest.TestCase):
+             deserialize(easy, b"\x05AAAAAAAA")
+         with self.assertRaises(Error):
+             deserialize(easy, b"\x02\xDE\xAD\xBE\xEF", protocol=Protocol.BINARY)
+-        with self.assertRaises(BufferError):
+-            deserialize_from_header(easy, b"\x02\xDE\xAD\xBE\xEF")
+-        with self.assertRaises(Error):
+-            control = easy(val=5, val_list=[4, 3, 2, 1])
+-            buf = serialize_with_header(control, transform=Transform.ZSTD_TRANSFORM)
+-            newBytes = bytearray(buf)
+-            newBytes[4] += 1
+-            deserialize_from_header(easy, bytes(newBytes))
+ 
+     def thrift_serialization_round_robin(
+         self, control: Struct, fixtures: Mapping[Protocol, bytes]
+-- 
+2.33.1
+

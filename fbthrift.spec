@@ -21,13 +21,16 @@
 %bcond_with tests
 
 Name:           fbthrift
-Version:        2021.11.29.00
+Version:        2021.12.20.00
 Release:        %autorelease
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        ASL 2.0
 URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+# causes deleted function error, revert
+# traced to https://github.com/facebook/fbthrift/blob/c1be51b727557db4696c9f39fff114dd44eaba4b/thrift/lib/py3/serializer.pyx#L80
+Patch0:         %{name}-revert_serializer_fix.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -43,8 +46,13 @@ BuildRequires:  flex
 BuildRequires:  fizz-devel
 BuildRequires:  folly-devel
 BuildRequires:  wangle-devel
+# Test dependencies
+%if %{with tests}
+BuildRequires:  gmock-devel
+BuildRequires:  gtest-devel
+%endif
 
-%description
+%global _description %{expand:
 Thrift is a serialization and RPC framework for service communication. Thrift
 enables these features in all major languages, and there is strong support for
 C++, Python, Hack, and Java. Most services at Facebook are written using Thrift
@@ -55,7 +63,9 @@ internal branch of Thrift that Facebook re-released to open source community in
 February 2014. Facebook Thrift was originally released closely tracking Apache
 Thrift but is now evolving in new directions. In particular, the compiler was
 rewritten from scratch and the new implementation features a fully asynchronous
-Thrift server.
+Thrift server.}
+
+%description %{_description}
 
 
 %package        devel
@@ -63,7 +73,8 @@ Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Conflicts:      thrift-devel
 
-%description    devel
+%description    devel %{_description}
+
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
@@ -79,7 +90,8 @@ BuildRequires:  python3dist(wheel)
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Conflicts:      python3-thrift
 
-%description -n python3-%{name}
+%description -n python3-%{name} %{_description}
+
 The python3-%{name} package contains Python bindings for %{name}.
 
 
@@ -88,7 +100,8 @@ Summary:        Development files for python3-%{name}
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Requires:       python3-%{name}%{?_isa} = %{version}-%{release}
 
-%description -n python3-%{name}-devel
+%description -n python3-%{name}-devel %{_description}
+
 The python3-%{name}-devel package contains libraries and header files for
 developing applications that use python3-%{name}.
 %endif
@@ -102,7 +115,7 @@ BuildRequires:  folly-static
 BuildRequires:  wangle-static
 Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 
-%description    static
+%description    static %{_description}
 The %{name}-static package contains static libraries for
 developing applications that use %{name}.
 %endif
