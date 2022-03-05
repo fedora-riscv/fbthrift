@@ -1,3 +1,14 @@
+%if 0%{?fedora} >= 36
+# Folly is compiled with Clang
+%bcond_without toolchain_clang
+%else
+%bcond_with toolchain_clang
+%endif
+
+%if %{with toolchain_clang}
+%global toolchain clang
+%endif
+
 # requires python3-Cython >= 0.29.17 for libcpp.utility.move
 %if 0%{?fedora} || 0%{?rhel} >= 9
 %bcond_without python
@@ -5,23 +16,13 @@
 %bcond_with python
 %endif
 
-## Depends on fizz, which has linking issues on some platforms:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1893332
-%ifarch i686 x86_64
-%bcond_without static
-%else
-%bcond_with static
-%endif
-
-%global _static_builddir static_build
-
 # tests currently failing
 # gmake[2]: *** [thrift/lib/py3/test/CMakeFiles/testing-py3-target.dir/build.make:82: thrift/lib/py3/test/gen-py3/testing_constants.h] Error 1
 # [FAILURE:/builddir/build/BUILD/fbthrift-2021.11.15.00/thrift/lib/py3/test/testing.thrift:17] Could not find include file thrift/annotation/cpp.thrift
-%bcond_with tests
+%bcond_with check
 
 Name:           fbthrift
-Version:        2022.02.21.00
+Version:        2022.02.28.00
 Release:        %autorelease
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
@@ -35,9 +36,17 @@ Patch0:         %{name}-revert_serializer_fix.patch
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
 ExcludeArch:    s390x
+%if 0%{?fedora} >= 36
+# fmt code breaks: https://bugzilla.redhat.com/show_bug.cgi?id=2061022
+ExcludeArch:    ppc64le
+%endif
 
 BuildRequires:  cmake
+%if %{with toolchain_clang}
+BuildRequires:  clang
+%else
 BuildRequires:  gcc-c++
+%endif
 # Tool dependencies
 BuildRequires:  bison
 BuildRequires:  chrpath
@@ -47,7 +56,7 @@ BuildRequires:  fizz-devel = %{version}
 BuildRequires:  folly-devel = %{version}
 BuildRequires:  wangle-devel = %{version}
 # Test dependencies
-%if %{with tests}
+%if %{with check}
 BuildRequires:  gmock-devel
 BuildRequires:  gtest-devel
 %endif
@@ -72,6 +81,7 @@ Thrift server.}
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Conflicts:      thrift-devel
+Obsoletes:      %{name}-static < 2022.02.28.00-1
 
 %description    devel %{_description}
 
@@ -107,42 +117,11 @@ developing applications that use python3-%{name}.
 %endif
 
 
-%if %{with static}
-%package        static
-Summary:        Static development libraries for %{name}
-BuildRequires:  fizz-static
-BuildRequires:  folly-static
-BuildRequires:  wangle-static
-Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
-
-%description    static %{_description}
-The %{name}-static package contains static libraries for
-developing applications that use %{name}.
-%endif
-
-
 %prep
 %autosetup -p1
 
 
 %build
-%if %{with static}
-# static build
-mkdir %{_static_builddir}
-pushd %{_static_builddir}
-%cmake .. \
-  -DBUILD_SHARED_LIBS=OFF \
-  -DCMAKE_INSTALL_DIR=%{_libdir}/cmake/%{name}-static \
-  -DPACKAGE_VERSION=%{version} \
-  -DFIZZ_ROOT=%{_libdir}/cmake/fizz-static \
-  -DFOLLY_ROOT=%{_libdir}/cmake/folly-static \
-  -DWANGLE_ROOT=%{_libdir}/cmake/wangle-static \
-  -Denable_tests=OFF
-%cmake_build
-popd
-
-%endif
-
 %cmake \
   -DCMAKE_INSTALL_DIR=%{_libdir}/cmake/%{name} \
   -DCMAKE_SKIP_INSTALL_RPATH=TRUE \
@@ -150,7 +129,7 @@ popd
 %if %{with python}
   -Dthriftpy3=ON \
 %endif
-%if %{with tests}
+%if %{with check}
   -Denable_tests=ON
 %else
   -Denable_tests=OFF
@@ -159,16 +138,9 @@ popd
 
 
 %install
-%if %{with static}
-# static build
-pushd %{_static_builddir}
-%cmake_install
-popd
-%endif
-
 %cmake_install
 
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
+# find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
 %if %{with python}
 # Delete RPATHs
@@ -177,8 +149,10 @@ chrpath --delete \
 %endif
 
 
+%if %{with check}
 %check
 %ctest
+%endif
 
 
 %files
@@ -205,130 +179,6 @@ chrpath --delete \
 %{python3_sitearch}/thrift/py3/*.pxd
 %endif
 
-%if %{with static}
-%files static
-%{_libdir}/*.a
-%{_libdir}/cmake/%{name}-static
-%endif
-
 
 %changelog
 %autochangelog
-* Fri Nov 12 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.11.08.00-1
-- Update to 2021.11.08.00
-
-* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 2021.08.02.00-3
-- Rebuilt with OpenSSL 3.0.0
-
-* Fri Aug 06 2021 Jonathan Wakely <jwakely@redhat.com> - 2021.08.02.00-2
-- Rebuilt for Boost 1.76
-
-* Thu Aug  5 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.08.02.00-1
-- Update to 2021.08.02.00
-- Drop now upstreamed patch to fix Cython build of stream.
-- Use _fbprefix for _serialize and _deserialize.
-
-* Sun Aug  1 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.07.22.00-1
-- Update to 2021.07.22.00
-- Fix stream compilation on i686 and armv7hl
-
-* Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-6
-- Use C++20 standard, in order to enable C++ coroutines.
-
-* Wed Jul 28 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-5
-- Include stream.{pxd,pyx,cpp} build in thrift/lib/py3 CMakeLists.
-
-* Mon Jul 26 2021 Filipe Brandenburger <filbranden@gmail.com> - 2021.06.28.00-4
-- Remove patch to rename _serialize, now that folly has been
-  updated to not include the problematic header file.
-
-* Sun Jul 25 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-3
-- Rebuilt for Folly 2021.07.20.01
-
-* Wed Jul 21 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2021.06.28.00-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Mon Jul 12 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.06.28.00-1
-- Update to 2021.06.28.00
-
-* Mon Jul 05 2021 Richard Shaw <hobbes1069@gmail.com> - 2021.05.10.00-3
-- Rebuild for new fmt version.
-
-* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2021.05.10.00-2
-- Rebuilt for Python 3.10
-
-* Mon May 10 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.05.10.00-1
-- Update to 2021.05.10.00
-
-* Mon Apr 26 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.04.26.00-1
-- Update to 2021.04.26.00
-
-* Fri Apr 16 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.04.12.00-1
-- Update to 2021.04.12.00
-
-* Mon Mar 29 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.03.29.00-1
-- Update to 2021.03.29.00
-
-* Wed Mar 24 2021 Michel Alexandre Salim <michel@michel-slm.name> - 2021.03.22.00-1
-- Update to 2021.03.22.00
-
-* Mon Mar 15 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.03.15.00-1
-- Update to 2021.03.15.00
-
-* Wed Feb 03 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.02.01.00-1
-- Update to 2021.02.01.00
-
-* Tue Jan 26 17:50:22 PST 2021 Michel Alexandre Salim <salimma@fedoraproject.org> - 2021.01.25.00-1
-- Update to 2021.01.25.00
-
-* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2020.12.28.00-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
-
-* Fri Jan 22 2021 Jonathan Wakely <jwakely@redhat.com> - 2020.12.28.00-2
-- Rebuilt for Boost 1.75
-
-* Tue Dec 29 12:15:55 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.12.28.00-1
-- Update to 2020.12.28.00
-
-* Tue Dec 22 16:57:24 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.12.21.00-1
-- Update to 2020.12.21.00
-
-* Mon Nov 30 10:42:52 PST 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.30.00-1
-- Update to 2020.11.30.00
-
-* Mon Nov 23 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.23.00-1
-- Update to 2020.11.23.00
-
-* Mon Nov 16 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.16.00-1
-- Update to 2020.11.16.00
-
-* Fri Nov 13 2020 Filipe Brandenburger <filbranden@fb.com> - 2020.11.09.00-3
-- Update CMakeList and setup.py for python3 to include all modules and
-  to include enums source together with the types module.
-
-* Tue Nov 10 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-2
-- Enable Python binding by default
-
-* Mon Nov  9 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.09.00-1
-- Update to 2020.11.09.00
-- Enable Python binding
-
-* Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-3
-- Rebase patch on top of upstream CMakeLists.txt change
-
-* Wed Nov  4 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-2
-- Enable static subpackage on architectures where fizz-static is available
-
-* Mon Nov  2 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.11.02.00-1
-- Update to 2020.11.02.00
-- Fix undefined symbol warnings
-
-* Mon Nov  2 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.10.26.00-3
-- Mark fbthrift-devel as conflicting with thrift-devel
-- Disable RPATH when installing libraries
-
-* Thu Oct 29 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.10.26.00-2
-- Use shorter, canonical URL for source
-
-* Tue Oct 27 2020 Michel Alexandre Salim <salimma@fedoraproject.org> - 2020.10.26.00-1
-- Initial package
