@@ -22,7 +22,7 @@
 %bcond_with check
 
 Name:           fbthrift
-Version:        2022.02.28.00
+Version:        2022.03.07.00
 Release:        %autorelease
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
@@ -32,6 +32,8 @@ Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 # causes deleted function error, revert
 # traced to https://github.com/facebook/fbthrift/blob/c1be51b727557db4696c9f39fff114dd44eaba4b/thrift/lib/py3/serializer.pyx#L80
 Patch0:         %{name}-revert_serializer_fix.patch
+# when compiling with clang but with gcc's libstdc++, this is needed
+Patch1:         %{name}-fix_contextstack.patch
 
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
@@ -118,7 +120,11 @@ developing applications that use python3-%{name}.
 
 
 %prep
-%autosetup -p1
+%setup -q
+%patch0 -p1
+%if %{with toolchain_clang}
+%patch1 -p1
+%endif
 
 
 %build

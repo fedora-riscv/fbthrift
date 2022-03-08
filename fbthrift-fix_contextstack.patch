@@ -1,0 +1,13 @@
+diff '--color=auto' -ruN fbthrift-2022.03.07.00/thrift/lib/cpp/ContextStack.cpp fbthrift-2022.03.07.00-fix_contextstack/thrift/lib/cpp/ContextStack.cpp
+--- fbthrift-2022.03.07.00/thrift/lib/cpp/ContextStack.cpp	2022-03-06 00:59:44.000000000 -0800
++++ fbthrift-2022.03.07.00-fix_contextstack/thrift/lib/cpp/ContextStack.cpp	2022-03-07 21:54:39.555802458 -0800
+@@ -226,8 +226,7 @@
+       connectionContext->~Cpp2ClientRequestContext();
+     }
+ 
+-    operator delete (
+-        cs, nbytes, std::align_val_t{alignof(apache::thrift::ContextStack)});
++    operator delete(cs, std::align_val_t{alignof(apache::thrift::ContextStack)});
+   }
+ }
+ } // namespace std
