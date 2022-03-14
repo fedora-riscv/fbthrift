@@ -22,7 +22,7 @@
 %bcond_with check
 
 Name:           fbthrift
-Version:        2022.03.07.00
+Version:        2022.03.14.00
 Release:        %autorelease
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
