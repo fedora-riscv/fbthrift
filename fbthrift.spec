@@ -1,5 +1,6 @@
-%if 0%{?fedora} >= 36
-# Folly is compiled with Clang
+%if 0%{?fedora} == 36
+# Folly is compiled with Clang - Now F37 folly is compiled with gcc
+# Also, on F37 build of fbthrift fails with clang on aarch64
 %bcond_without toolchain_clang
 %else
 %bcond_with toolchain_clang
