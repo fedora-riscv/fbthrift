@@ -39,7 +39,7 @@ Patch1:         %{name}-fix_contextstack.patch
 # Folly is known not to work on big-endian CPUs
 # https://bugzilla.redhat.com/show_bug.cgi?id=1894635
 ExcludeArch:    s390x
-%if 0%{?fedora} >= 36
+%if 0%{?fedora} == 36
 # fmt code breaks: https://bugzilla.redhat.com/show_bug.cgi?id=2061022
 ExcludeArch:    ppc64le
 %endif
