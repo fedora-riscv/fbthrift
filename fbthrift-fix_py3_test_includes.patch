@@ -1,0 +1,12 @@
+Index: b/thrift/lib/py3/test/CMakeLists.txt
+===================================================================
+--- a/thrift/lib/py3/test/CMakeLists.txt
++++ b/thrift/lib/py3/test/CMakeLists.txt
+@@ -43,6 +43,7 @@ macro(thrift_py3_test filename services)
+     "${CMAKE_CURRENT_SOURCE_DIR}"
+     "${CMAKE_CURRENT_BINARY_DIR}"
+     "test"
++    THRIFT_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}
+   )
+ 
+   foreach(_src

@@ -1,0 +1,2 @@
+fbthrift-fix_serializer_assignment.patch
+fbthrift-disable_py3_tests.patch

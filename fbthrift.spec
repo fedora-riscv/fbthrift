@@ -1,10 +1,4 @@
-%if 0%{?fedora} == 36
-# Folly is compiled with Clang - Now F37 folly is compiled with gcc
-# Also, on F37 build of fbthrift fails with clang on aarch64
-%bcond_without toolchain_clang
-%else
 %bcond_with toolchain_clang
-%endif
 
 %if %{with toolchain_clang}
 %global toolchain clang
@@ -20,10 +14,10 @@
 # tests currently failing
 # gmake[2]: *** [thrift/lib/py3/test/CMakeFiles/testing-py3-target.dir/build.make:82: thrift/lib/py3/test/gen-py3/testing_constants.h] Error 1
 # [FAILURE:/builddir/build/BUILD/fbthrift-2021.11.15.00/thrift/lib/py3/test/testing.thrift:17] Could not find include file thrift/annotation/cpp.thrift
-%bcond_with check
+%bcond_without check
 
 Name:           fbthrift
-Version:        2022.03.14.00
+Version:        2022.07.11.00
 Release:        %autorelease
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
@@ -32,17 +26,15 @@ URL:            https://github.com/facebook/fbthrift
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 # causes deleted function error, revert
 # traced to https://github.com/facebook/fbthrift/blob/c1be51b727557db4696c9f39fff114dd44eaba4b/thrift/lib/py3/serializer.pyx#L80
-Patch0:         %{name}-revert_serializer_fix.patch
+Patch:          %{name}-fix_serializer_assignment.patch
+# need to properly fix this; temporarily work around by disabling py3 tests
+# [FAILURE:/builddir/build/BUILD/fbthrift-2022.07.11.00/thrift/lib/py3/test/testing.thrift:17] Could not find include file thrift/annotation/cpp.thrift
+# Patch:          %%{name}-fix_py3_test_includes.patch
+Patch:          %{name}-disable_py3_tests.patch
 # when compiling with clang but with gcc's libstdc++, this is needed
-Patch1:         %{name}-fix_contextstack.patch
+Source1:        %{name}-fix_contextstack.patch
 
-# Folly is known not to work on big-endian CPUs
-# https://bugzilla.redhat.com/show_bug.cgi?id=1894635
-ExcludeArch:    s390x
-%if 0%{?fedora} == 36
-# fmt code breaks: https://bugzilla.redhat.com/show_bug.cgi?id=2061022
-ExcludeArch:    ppc64le
-%endif
+ExclusiveArch:  x86_64 aarch64 ppc64le
 
 BuildRequires:  cmake
 %if %{with toolchain_clang}
@@ -121,10 +113,9 @@ developing applications that use python3-%{name}.
 
 
 %prep
-%setup -q
-%patch0 -p1
+%autosetup -p1
 %if %{with toolchain_clang}
-%patch1 -p1
+cat %{SOURCE1} | patch -p1
 %endif
 
 

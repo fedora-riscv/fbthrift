@@ -1,33 +1,28 @@
-From faa9fb530f0058497e27f8f5dc1a6727c8570429 Mon Sep 17 00:00:00 2001
-From: Michel Alexandre Salim <salimma@fedoraproject.org>
-Date: Thu, 23 Dec 2021 16:15:12 -0800
-Subject: [PATCH] Revert "Fix crash in py3 serializer when using
- deserialize_from_header"
+Revert "Fix crash in py3 serializer when using deserialize_from_header"
 
-This reverts commit 1cf7dbaa5734aaba85561a9005436c231936e9dd.
----
- thrift/lib/py3/serializer.pxd     | 2 +-
- thrift/lib/py3/serializer.pyx     | 8 +-------
- thrift/lib/py3/test/serializer.py | 8 --------
- 3 files changed, 2 insertions(+), 16 deletions(-)
+This reverts commit 1cf7dbaa5734aaba85561a9005436c231936e9dd
 
-diff --git a/thrift/lib/py3/serializer.pxd b/thrift/lib/py3/serializer.pxd
-index 880160ef6..ad12d6932 100644
---- a/thrift/lib/py3/serializer.pxd
-+++ b/thrift/lib/py3/serializer.pxd
-@@ -39,4 +39,4 @@ cdef extern from "thrift/lib/cpp/transport/THeader.h" namespace "apache::thrift:
-         uint16_t getProtocolId()
-         void setTransform(Transform)
-         unique_ptr[cIOBuf] addHeader(unique_ptr[cIOBuf], map[string, string])
--        unique_ptr[cIOBuf] removeHeader(cIOBufQueue*, size_t&, map[string, string]) except +
-+        unique_ptr[cIOBuf] removeHeader(cIOBufQueue*, size_t&, map[string, string])
-diff --git a/thrift/lib/py3/serializer.pyx b/thrift/lib/py3/serializer.pyx
-index b924ddb5a..7d3acb04c 100644
+Without reverting this, fbthrift fails to compile:
+
+```
+/builddir/build/BUILD/fbthrift-2022.07.11.00/redhat-linux-build/thrift/lib/py3/cybld/thrift/py3/serializer.cpp: In function ‘PyObject* __pyx_pf_6thrift_3py3_10serializer_12deserialize_from_header(PyObject*, PyObject*, PyObject*)’:
+/builddir/build/BUILD/fbthrift-2022.07.11.00/redhat-linux-build/thrift/lib/py3/cybld/thrift/py3/serializer.cpp:6806:22: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>& std::unique_ptr<_Tp, _Dp>::operator=(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = folly::IOBuf; _Dp = std::default_delete<folly::IOBuf>]’
+ 6806 |       __pyx_v_cbuf = __pyx_t_9;
+      |                      ^~~~~~~~~
+In file included from /usr/include/c++/12/memory:76,
+                 from /builddir/build/BUILD/fbthrift-2022.07.11.00/redhat-linux-build/thrift/lib/py3/cybld/thrift/py3/serializer.cpp:714:
+/usr/include/c++/12/bits/unique_ptr.h:515:19: note: declared here
+  515 |       unique_ptr& operator=(const unique_ptr&) = delete;
+      |                   ^~~~~~~~
+make[2]: *** [thrift/lib/py3/CMakeFiles/thrift-py3-serializer-py3.dir/build.make:83: thrift/lib/py3/CMakeFiles/thrift-py3-serializer-py3.dir/cybld/thrift/py3/serializer.cpp.o] Error 1
+```
+Index: b/thrift/lib/py3/serializer.pyx
+===================================================================
 --- a/thrift/lib/py3/serializer.pyx
 +++ b/thrift/lib/py3/serializer.pyx
-@@ -75,12 +75,6 @@ def deserialize_from_header(structKlass, buf not None):
+@@ -75,12 +75,6 @@ def deserialize_from_header(structKlass,
      cdef cTHeader header
-     cdef map[string, string] pheaders
+     cdef F14NodeMap[string, string] pheaders
      cdef size_t needed = 0
 -    cdef unique_ptr[cIOBuf] cbuf
 -    try:
@@ -39,11 +34,11 @@ index b924ddb5a..7d3acb04c 100644
 +    cbuf = header.removeHeader(&queue, needed, pheaders)
      protoid = Protocol(header.getProtocolId())
      return deserialize(structKlass, _fbthrift_iobuf.from_unique_ptr(_fbthrift_iobuf.move(cbuf)), protocol=protoid)
-diff --git a/thrift/lib/py3/test/serializer.py b/thrift/lib/py3/test/serializer.py
-index d92dc27ad..60ec4ee01 100644
+Index: b/thrift/lib/py3/test/serializer.py
+===================================================================
 --- a/thrift/lib/py3/test/serializer.py
 +++ b/thrift/lib/py3/test/serializer.py
-@@ -116,14 +116,6 @@ class SerializerTests(unittest.TestCase):
+@@ -124,14 +124,6 @@ class SerializerTests(unittest.TestCase)
              deserialize(easy, b"\x05AAAAAAAA")
          with self.assertRaises(Error):
              deserialize(easy, b"\x02\xDE\xAD\xBE\xEF", protocol=Protocol.BINARY)
@@ -58,6 +53,3 @@ index d92dc27ad..60ec4ee01 100644
  
      def thrift_serialization_round_robin(
          self, control: Struct, fixtures: Mapping[Protocol, bytes]
--- 
-2.33.1
-

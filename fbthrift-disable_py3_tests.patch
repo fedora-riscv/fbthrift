@@ -1,0 +1,12 @@
+Index: b/thrift/lib/py3/CMakeLists.txt
+===================================================================
+--- a/thrift/lib/py3/CMakeLists.txt
++++ b/thrift/lib/py3/CMakeLists.txt
+@@ -142,7 +142,3 @@ install(CODE "
+   --prefix ${CMAKE_INSTALL_PREFIX} ${ROOT_ARG}
+   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cybld)"
+ )
+-
+-if (enable_tests)
+-  add_subdirectory(test)
+-endif ()
