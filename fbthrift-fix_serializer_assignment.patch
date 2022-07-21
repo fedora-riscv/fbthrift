@@ -1,0 +1,16 @@
+Properly move the unique_ptr from `header.removeHeader`
+
+`removeHeader` returns a `unique_ptr`, and this can't be assigned to another `unique_ptr`, it has to be moved.
+Index: b/thrift/lib/py3/serializer.pyx
+===================================================================
+--- a/thrift/lib/py3/serializer.pyx
++++ b/thrift/lib/py3/serializer.pyx
+@@ -77,7 +77,7 @@ def deserialize_from_header(structKlass,
+     cdef size_t needed = 0
+     cdef unique_ptr[cIOBuf] cbuf
+     try:
+-        cbuf = header.removeHeader(&queue, needed, pheaders)
++        cbuf = _fbthrift_iobuf.move(header.removeHeader(&queue, needed, pheaders))
+     except Exception as e:
+         raise Error.__new__(Error, *e.args) from None
+     if cbuf == NULL:
