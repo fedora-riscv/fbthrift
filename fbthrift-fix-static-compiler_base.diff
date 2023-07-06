@@ -1,0 +1,25 @@
+From 851848995d951169c8037575bc10986bbc321b8d Mon Sep 17 00:00:00 2001
+From: Michel Alexandre Salim <salimma@fedoraproject.org>
+Date: Thu, 6 Jul 2023 16:04:05 -0500
+Subject: [PATCH] Revert "Always build compiler_base as a static library"
+
+This reverts commit b537aedb62b82f7a0daf785e4d72f7f4a64c4596.
+---
+ thrift/compiler/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/thrift/compiler/CMakeLists.txt b/thrift/compiler/CMakeLists.txt
+index 9631856230..641e7d7384 100644
+--- a/thrift/compiler/CMakeLists.txt
++++ b/thrift/compiler/CMakeLists.txt
+@@ -48,7 +48,6 @@ target_link_libraries(
+ # The base library.
+ add_library(
+   compiler_base
+-  STATIC
+ 
+   detail/system.cc
+   diagnostic.cc
+-- 
+2.41.0
+
