@@ -27,6 +27,8 @@ Source1:        %{name}-fix_contextstack.patch
 # revert the fix for https://github.com/facebook/fbthrift/issues/276
 # we don't want a mix of dynamic and static libraries
 Patch0:         %{name}-fix-static-compiler_base.diff
+# fix undefined reference because new source file was not included
+Patch1:         %{url}/commit/81f46f453be0f5f7b331fb624cc0b04247daae65.patch#/%{name}-add-event_handler_runtime.diff
 
 ExclusiveArch:  x86_64 aarch64 ppc64le
 
