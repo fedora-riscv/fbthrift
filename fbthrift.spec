@@ -16,7 +16,7 @@
 
 Name:           fbthrift
 Version:        2023.10.16.00
-Release:        %autorelease
+Release:        %autorelease -e rv64
 Summary:        Facebook's branch of Apache Thrift, including a new C++ server
 
 License:        Apache-2.0
@@ -28,7 +28,7 @@ Source1:        %{name}-fix_contextstack.patch
 # we don't want a mix of dynamic and static libraries
 Patch0:         %{name}-fix-static-compiler_base.diff
 
-ExclusiveArch:  x86_64 aarch64 ppc64le
+ExclusiveArch:  x86_64 aarch64 ppc64le riscv64
 
 BuildRequires:  cmake
 %if %{with toolchain_clang}
